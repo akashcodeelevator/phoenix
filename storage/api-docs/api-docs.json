@@ -1,0 +1,1293 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Decentra API",
+        "description": "Description of your API",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Login & Register"
+                ],
+                "summary": "Authenticate user and generate JWT token",
+                "operationId": "2bd778ac594b753b1466d635caf32e28",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email Or UserName",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User's password",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/v1/verify_wallet": {
+            "get": {
+                "tags": [
+                    "Login & Register"
+                ],
+                "summary": "Validate user's wallet address for a specific network",
+                "operationId": "a3a9d34a8e2ffe39fb6d73a8a63a5d74",
+                "parameters": [
+                    {
+                        "name": "wallet_address",
+                        "in": "query",
+                        "description": "User's wallet address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Address validation result",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "valid": {
+                                            "description": "Validation status",
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "description": "Validation message",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/checksponsor": {
+            "get": {
+                "tags": [
+                    "Package"
+                ],
+                "summary": "Check if a sponsor is valid",
+                "operationId": "63cee9d8b1041efbdf65ec77ad022e95",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "description": "The ID of the sponsor to validate",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sponsor is valid"
+                    },
+                    "404": {
+                        "description": "Sponsor not found"
+                    },
+                    "422": {
+                        "description": "Invalid input"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/pin-details": {
+            "get": {
+                "tags": [
+                    "Package"
+                ],
+                "summary": "Fetch Package where status is 1",
+                "operationId": "c90b008a974f4819ffa28954dd980e34",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/investment": {
+            "post": {
+                "tags": [
+                    "Package"
+                ],
+                "summary": "Process investment for a user",
+                "operationId": "f66daaa961b7c3fb08e22b6abf8b5014",
+                "parameters": [
+                    {
+                        "name": "tx_username",
+                        "in": "query",
+                        "description": "Username of the user making the investment",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "selected_pin",
+                        "in": "query",
+                        "description": "Selected pin for the investment",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount of the investment",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "country_name",
+                        "in": "query",
+                        "description": "Enter Country Name",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otp_input1",
+                        "in": "query",
+                        "description": "OTP for validation",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Investment successful"
+                    },
+                    "400": {
+                        "description": "Validation failed"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fund-details": {
+            "get": {
+                "tags": [
+                    "Fund"
+                ],
+                "summary": "Fetch payment methods where status is 1",
+                "operationId": "1c374ab243d577c582ad56e4f345886b",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "No payment methods found"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fund-request": {
+            "post": {
+                "tags": [
+                    "Fund"
+                ],
+                "summary": "Submit a fund request",
+                "operationId": "08186ef7c5452d0f80f6874ae024993a",
+                "parameters": [
+                    {
+                        "name": "address",
+                        "in": "query",
+                        "description": "Crypto wallet address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "payment_type",
+                        "in": "query",
+                        "description": "Type of payment",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount to request",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "utr_number",
+                        "in": "query",
+                        "description": "UTR (Unique Transaction Reference) number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "payment_slip",
+                        "in": "query",
+                        "description": "Uploaded image of the payment slip",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fund request submitted successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fund-transfer": {
+            "post": {
+                "tags": [
+                    "Fund"
+                ],
+                "summary": "Transfer funds between wallets",
+                "operationId": "655ef9272c137f1042ac1e84dc4e0e8a",
+                "parameters": [
+                    {
+                        "name": "from_wallet",
+                        "in": "query",
+                        "description": "Source wallet slug",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "to_wallet",
+                        "in": "query",
+                        "description": "Destination wallet slug",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "description": "Recipient username",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "in": "query",
+                        "description": "Amount to transfer",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "minimum": 0.01
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fund transfer successful"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/report": {
+            "get": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Get transaction report with filters",
+                "operationId": "638fea567fb045cf3d127bca21be2ed4",
+                "parameters": [
+                    {
+                        "name": "tx_type",
+                        "in": "query",
+                        "description": "Filter by transaction type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "debit_credit",
+                        "in": "query",
+                        "description": "Filter by debit or credit (debit/credit)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "wallet_type",
+                        "in": "query",
+                        "description": "Filter by wallet type",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction report",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "amount": {
+                                                        "type": "number"
+                                                    },
+                                                    "date": {
+                                                        "type": "string"
+                                                    },
+                                                    "remark": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "u_code": {
+                                                        "type": "string"
+                                                    },
+                                                    "wallet_type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/api/v1/teamdirect": {
+            "get": {
+                "tags": [
+                    "Team"
+                ],
+                "summary": "Get team list for a Team",
+                "operationId": "4b8f31c681c6fb956204616b5a9c59e6",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by user status (1 for active, 0 for inactive)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "start_date",
+                        "in": "query",
+                        "description": "Start date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "end_date",
+                        "in": "query",
+                        "description": "End date for filtering",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Team list",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "mobile": {
+                                                        "type": "string"
+                                                    },
+                                                    "username": {
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "type": "integer"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "type": "integer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request"
+                    }
+                }
+            }
+        },
+        "/api/v1/updateWalletAddress": {
+            "post": {
+                "tags": [
+                    "Withdraw"
+                ],
+                "summary": "Update ETH address for a user",
+                "operationId": "82e5d8f8e6bbc0e32d6e4e4e4c4d26e6",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "description": "The username of the user",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "eth_address",
+                        "in": "query",
+                        "description": "New ETH address to be added or updated",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ETH address updated successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fundWithdraw": {
+            "post": {
+                "tags": [
+                    "Withdraw"
+                ],
+                "summary": "Submit a fund withdrawal request",
+                "operationId": "8f6c8fbc49050265f417783661df399a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "selected_wallet",
+                                    "amount"
+                                ],
+                                "properties": {
+                                    "selected_wallet": {
+                                        "description": "Wallet type (e.g., main_wallet)",
+                                        "type": "string"
+                                    },
+                                    "amount": {
+                                        "description": "Withdrawal amount",
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "selected_address": {
+                                        "description": "Recipient crypto address (if applicable)",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Withdrawal request processed successfully"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    },
+                    "500": {
+                        "description": "Unexpected server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/fund-request-history": {
+            "get": {
+                "tags": [
+                    "Fund"
+                ],
+                "summary": "Get fund request history",
+                "description": "Get Fund Request History based on status.",
+                "operationId": "03b5536edf7390f48c788ce5638d6ff8",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (approve, pending, cancel)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "approve",
+                                "pending",
+                                "cancel"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Fund request history retrieved successfully"
+                    },
+                    "404": {
+                        "description": "No fund request found"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/withdraw-request-history": {
+            "get": {
+                "tags": [
+                    "Withdraw"
+                ],
+                "summary": "Get withdraw request history",
+                "description": "Get Withdraw Request History based on status.",
+                "operationId": "1c36e55b68dc0a3bfaa08d2cb2232fec",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (Approve, Pending, Cancel)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "Approve",
+                                "Pending",
+                                "Cancel"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Withdraw request history retrieved successfully"
+                    },
+                    "404": {
+                        "description": "No withdraw request found"
+                    },
+                    "500": {
+                        "description": "Unexpected error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/verify-transaction": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Verify a USDT transaction",
+                "description": "This endpoint verifies a USDT transaction by its hash, checks its validity, and marks it as successful if verified.",
+                "operationId": "8b2f132bd54ea39aabf25c55d7bb8a4f",
+                "parameters": [
+                    {
+                        "name": "txHash",
+                        "in": "query",
+                        "description": "Transaction hash to be verified",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "0x123abc...transactionHash"
+                        }
+                    },
+                    {
+                        "name": "from_address",
+                        "in": "query",
+                        "description": "Transaction From Wallet Address",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "0x123abc...Address"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction verified successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Transaction is verified and successful."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Login & Register"
+                ],
+                "summary": "Register a new user",
+                "operationId": "e3d7c33191c03363f0fe6765dde1c762",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "User's name",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User's password",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    },
+                    {
+                        "name": "mobile",
+                        "in": "query",
+                        "description": "User's mobile number",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "referral_code",
+                        "in": "query",
+                        "description": "Referral code ",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "eth_address",
+                        "in": "query",
+                        "description": "User's Wallet Address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User registered successfully"
+                    },
+                    "422": {
+                        "description": "Validation errors"
+                    }
+                }
+            }
+        },
+        "/api/v1/user": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get logged-in user details",
+                "operationId": "e443d636ae2668a930dd26b0462e944e",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/change-password": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user password",
+                "description": "Change user password",
+                "operationId": "2b8b5346283f85991b33b5583a22c35b",
+                "parameters": [
+                    {
+                        "name": "current_password",
+                        "in": "query",
+                        "description": "User's Current password",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    },
+                    {
+                        "name": "new_password",
+                        "in": "query",
+                        "description": "User's New password",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    },
+                    {
+                        "name": "new_password_confirmation",
+                        "in": "query",
+                        "description": "User's New password confirmation",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "password"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password updated successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Logout user",
+                "description": "Logout user",
+                "operationId": "95c20f5153ad6cbd9a7de701fdef9493",
+                "responses": {
+                    "200": {
+                        "description": "Successfully logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/profile-update": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user profile",
+                "description": "Update the authenticated user's name and profile image.",
+                "operationId": "18959ea70ecddac85b31507c1bac0326",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "User's full name",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "pic_image",
+                        "in": "query",
+                        "description": "Uploaded image of the payment slip",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profile updated successfully"
+                    },
+                    "400": {
+                        "description": "Bad request"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/kyc-verification/{accountId?}": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Create or Update KYC information for a user",
+                "description": "Create or update KYC (Know Your Customer) information for the authenticated user. If `accountId` is provided, the existing account will be updated, otherwise, a new KYC record will be created.",
+                "operationId": "7a61323724760bab0b158d9365b6ea49",
+                "parameters": [
+                    {
+                        "name": "accountId",
+                        "in": "path",
+                        "description": "The ID of the user account to update. If not provided, a new KYC record will be created.",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "document_type",
+                        "in": "query",
+                        "description": "Type of document for KYC verification (pan, adhaar, or both).",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "pan",
+                                "adhaar",
+                                "both"
+                            ],
+                            "example": "pan"
+                        }
+                    },
+                    {
+                        "name": "pan_no",
+                        "in": "query",
+                        "description": "PAN number for KYC verification.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ABCDE1234F"
+                        }
+                    },
+                    {
+                        "name": "pan_image",
+                        "in": "query",
+                        "description": "Uploaded PAN image for KYC verification.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    },
+                    {
+                        "name": "adhaar_no",
+                        "in": "query",
+                        "description": "Aadhaar number for KYC verification.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "1234-5678-9123"
+                        }
+                    },
+                    {
+                        "name": "adhaar_image",
+                        "in": "query",
+                        "description": "Uploaded Aadhaar front image for KYC verification.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    },
+                    {
+                        "name": "adhaar_back_image",
+                        "in": "query",
+                        "description": "Uploaded Aadhaar back image for KYC verification.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "binary"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "KYC information updated successfully."
+                    },
+                    "400": {
+                        "description": "Bad request, validation failed."
+                    },
+                    "404": {
+                        "description": "User account not found."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/get_kyc": {
+            "get": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get logged-in user Kyc details",
+                "operationId": "9f6d015aef55d07c957aaf2b7df86e43",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/email-send": {
+            "post": {
+                "tags": [
+                    "Login & Register"
+                ],
+                "summary": "Send an email with OTP for verification",
+                "operationId": "3c9a2850051a2dce98d8534708b54f57",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email address to send the OTP to",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email sent successfully"
+                    }
+                }
+            }
+        },
+        "/api/v1/otp-verify": {
+            "post": {
+                "tags": [
+                    "Login & Register"
+                ],
+                "summary": "Verify the OTP sent to user's email",
+                "operationId": "6c3f1608d65277252a23d8f9eb2a4156",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email address",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "otp",
+                        "in": "query",
+                        "description": "OTP received by the user on their email",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OTP verified successfully"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Login & Register",
+            "description": "Login & Register"
+        },
+        {
+            "name": "Package",
+            "description": "Package"
+        },
+        {
+            "name": "Fund",
+            "description": "Fund"
+        },
+        {
+            "name": "Transactions",
+            "description": "Transactions"
+        },
+        {
+            "name": "Team",
+            "description": "Team"
+        },
+        {
+            "name": "Withdraw",
+            "description": "Withdraw"
+        },
+        {
+            "name": "User",
+            "description": "User"
+        }
+    ]
+}
