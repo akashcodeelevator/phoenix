@@ -63,7 +63,7 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>',
+    'login-logo' => '<b>Admin</b>',
     'logo_img' => 'storage/logo.png',
     'logo_img_class' => 'brand-image elevation-3',
     'logo_img_xl' => null,
@@ -373,7 +373,7 @@ return [
                 ],
                 [
                     'text' => 'Fund Transfer History',
-                    'url' => 'admin/fund_transfer_history',
+                    'url' => 'admin/fundrequests/history',
                 ],
 
                 [

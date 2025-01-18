@@ -26,11 +26,13 @@ class RedirectIfAuthenticated
                 if ($guard === 'admin') {
                     return redirect('/admin/dashboard');
                 }
+                if ($guard === 'web') {
+                    return redirect('/user/dashboard');
+                }
                 return redirect(RouteServiceProvider::HOME);
             }
         }
 
         return $next($request);
-        
     }
 }
