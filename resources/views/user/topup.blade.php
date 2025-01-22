@@ -55,9 +55,9 @@
                                     <select class="form-control mt-1 selected_pins" name="selected_pin" id="selected_pin"
                                         data-response="total_pins" required>
                                         <option value="">Select Package</option>
-                                        <option value="Package1">$50 - $250</option>
-                                        <option value="Package2">$500 - $1500</option>
-                                        <option value="Package3">$2500 - $5000</option>
+                                        <option value="1">$50 - $250</option>
+                                        <option value="2">$500 - $1500</option>
+                                        <option value="3">$2500 - $5000</option>
                                     </select>
                                     <span class="text-danger">
                                         @error('selected_pin')

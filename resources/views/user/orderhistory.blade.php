@@ -6,19 +6,17 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>Withdraw History</h4>
+                        <h4>Order History</h4>
                     </div>
                     <div class="card-body">
-                        <table id="withdrawTable" class="table table-striped table-bordered">
+                        <table id="orderTable" class="table table-striped table-bordered">
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Name</th>
-                                    <th>Amount</th>
+                                    <th>Package Name</th>
+                                    <th>Package Amount</th>
                                     <th>Status</th>
                                     <th>Created At</th>
-                                    <th>Remark</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -35,40 +33,32 @@
 
         <script>
             $(document).ready(function() {
-                $('#withdrawTable').DataTable({
+                $('#orderTable').DataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: '{{ route('user.getwithdrawhistory') }}',
+                    ajax: '{{ route('user.getorderhistory') }}',
                     columns: [{
                             data: 'id',
                             name: 'id'
                         },
                         {
-                            data: 'username',
-                            name: 'users.username'
+                            data: 'pin_type',
+                            name: 'users.pin_type'
                         },
                         {
-                            data: 'name',
-                            name: 'users.name'
-                        },
-                        {
-                            data: 'amount',
-                            name: 'transaction.amount'
+                            data: 'order_amount',
+                            name: 'orders.order_amount'
                         },
                         {
                             data: 'status',
-                            name: 'transaction.status',
+                            name: 'orders.status',
                             render: function(data) {
                                 return data == 1 ? 'Approved' : (data == 2 ? 'Cancelled' : 'Pending');
                             }
                         },
                         {
                             data: 'created_at',
-                            name: 'transaction.created_at'
-                        },
-                        {
-                            data: 'remark',
-                            name: 'transaction.remark'
+                            name: 'orders.created_at'
                         },
                     ],
                 });

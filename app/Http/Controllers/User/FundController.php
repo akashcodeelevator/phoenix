@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\AdvancedInfo;
+use App\Models\Order;
+use App\Models\PinDetail;
 use App\Models\UserWallet;
 use App\Models\WalletType;
 use Illuminate\Http\Request;
@@ -12,6 +14,7 @@ use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
 class FundController extends Controller
@@ -307,6 +310,118 @@ class FundController extends Controller
         $fund_wallet  = $userWallet->$source_2 ?? 0;
         return view('user.topup', compact('user', 'main_wallet', 'fund_wallet'));
     }
+    public function topup(Request $request)
+    {
+        //dd($request);
+        // Validation Rules
+        $validatedData = $request->validate([
+            'tx_username' => 'required|exists:users,username',
+            'selected_pin' => 'required|exists:pin_details,id',
+            'amount' => 'required|numeric|gt:0',
+            'selected_wallet' => 'required',
+            'otp_input1' => 'nullable|exists:otp,code', // Assuming OTP validation
+        ]);
+
+        try {
+
+            // Retrieve User Details
+            $txUsername = $request->tx_username;
+            $txUser = User::where('username', $txUsername)->first();
+            $userId = auth()->user()->id;
+            $amount = $request->amount;
+            $selectedWallet = $request->selected_wallet;
+            $pinType = $request->selected_pin;
+            $pinDetails = PinDetail::where('id', $pinType)->first();
+
+            // Check wallet balance
+            $fundAmount = UserWallet::where('u_code', $userId)->value('c2');
+            if (!($fundAmount > $amount && $fundAmount > $pinDetails->pin_rate)) {
+                return redirect()->back()->withErrors(['error' => "Invalid Amount! Minimum {$pinDetails->pin_rate} $ required."]);
+            }
+
+            // Determine transaction type (purchase or repurchase)
+            $userDetails = User::find($txUser->id);
+            $txType = ($userDetails->active_status == 1) ? 'repurchase' : 'purchase';
+            $activeId = ($txType === 'purchase') ? User::max('active_id') + 1 : 0;
+            $status = ($txType === 'purchase') ? 'yes' : 'no';
+
+            if ($txType === 'repurchase') {
+                return redirect()->back()->withErrors(['error' => 'Once Plan is Active, Please ReTopup.']);
+            }
+
+            // Update sponsor wallets
+            $regType = AdvancedInfo::where('label', 'like', 'reg_type')->value('value');
+            $uSponsorId = $userDetails->u_sponsor;
+            if ($uSponsorId) {
+                $source1 = WalletType::where('slug', 'active_directs')->where('wallet_type', 'team')->where($regType, 1)->value('wallet_column');
+                $source2 = WalletType::where('slug', 'inactive_directs')->where('wallet_type', 'team')->where($regType, 1)->value('wallet_column');
+
+                $sponsorWallet = UserWallet::firstOrNew(['u_code' => $uSponsorId]);
+                $sponsorWallet->$source1 = ($sponsorWallet->$source1 ?? 0) + 1;
+                $sponsorWallet->$source2 = ($sponsorWallet->$source2 ?? 0) - 1;
+                $sponsorWallet->save();
+            }
+
+            // Create order
+            $order = Order::create([
+                'order_details' => $pinDetails->pkg_type,
+                'u_code' => $txUser->id,
+                'tx_user_id' => $userId,
+                'tx_type' => $txType,
+                'package_type' => $pinType,
+                'order_amount' => $amount,
+                'order_bv' => $amount,
+                'pv' => $pinDetails->pin_value,
+                'roi' => $pinDetails->roi,
+                'status' => 1,
+                'payout_id' => 1,
+                'payout_status' => 0,
+                'active_id' => $activeId,
+            ]);
+
+            // Deduct from wallet
+            $walletColumn = WalletType::where('slug', $selectedWallet)->where('wallet_type', 'wallet')->where($regType, 1)->value('wallet_column');
+            $userWallet = UserWallet::firstOrNew(['u_code' => $userId]);
+            $userWallet->$walletColumn = ($userWallet->$walletColumn ?? 0) - $amount;
+            $userWallet->save();
+
+            // Update user activation status
+            if ($status === 'yes') {
+                $userDetails->update([
+                    'my_package' => $amount,
+                    'rank_id' => $pinDetails->id,
+                    'active_id' => $activeId,
+                    'active_status' => 1,
+                    'active_date' => now(),
+                ]);
+            } else {
+                $userDetails->update([
+                    'my_package' => $amount,
+                    'rank_id' => $pinDetails->id,
+                    'retopup_status' => 1,
+                    'retopup_date' => now(),
+                ]);
+            }
+
+            // Create transaction record
+            Transaction::create([
+                'u_code' => $userId,
+                'tx_u_code' => $txUser->id,
+                'tx_type' => 'topup',
+                'debit_credit' => 'debit',
+                'wallet_type' => $selectedWallet,
+                'amount' => $amount,
+                'tx_charge' => 0, // Assuming no charge
+                'date' => now(),
+                'status' => 1,
+                'remark' => auth()->user()->username . " topup $txUsername of amount $amount",
+            ]);
+            $this->direct_destribute($userDetails, $amount,  $register_fee = 0);
+            return redirect()->back()->with('success', "$txUsername activated Package of amount $amount successfully!");
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'An unexpected error occurred.']);
+        }
+    }
     public function viptopupform()
     {
         $user = Auth::user();
@@ -457,5 +572,118 @@ class FundController extends Controller
             // })
             //->rawColumns(['actions']) // Ensure the actions column is not escaped
             ->make(true);
+    }
+    function direct_destribute($user, $amount, $register_fee = 0)
+    {
+        $code = $user->u_sponsor;
+        $ben_from = $user->id;
+        $source = 'direct';
+        $name  = $user->name;
+        $username = $user->username;
+        $l = 1;
+        $amount = $register_fee ?? 10;
+        $reg_type = AdvancedInfo::where('label', 'like', 'reg_type')->value('value');
+        $plan = PinDetail::where('status', 1)->first();
+        if ($plan) {
+            $col_nm = WalletType::where('slug', 'like', 'active_directs')->where('wallet_type', 'like', 'team')->where($reg_type, 1)->value('wallet_column');
+            $direct_count = UserWallet::where('u_code', $code)->value($col_nm);
+
+            // Determine income percentage based on direct referral count
+            if ($direct_count >= 1 && $direct_count <= 10) {
+                $level_percentage = 0.10;
+            } elseif ($direct_count >= 11 && $direct_count <= 20) {
+                $level_percentage = 0.20;
+            } elseif ($direct_count >= 21 && $direct_count <= 30) {
+                $level_percentage = 0.30;
+            } elseif ($direct_count >= 31 && $direct_count <= 40) {
+                $level_percentage = 0.40;
+            } else { // 41 and above
+                $level_percentage = 0.50;
+            }
+
+            $payable_amount = $amount * $level_percentage;
+
+            if ($payable_amount > 0 && $code != '') {
+                $transaction = [
+                    'tx_u_code' => $ben_from,
+                    'u_code' => $code,
+                    'tx_type' => 'income',
+                    'source' => $source,
+                    'debit_credit' => 'credit',
+                    'amount' => $payable_amount,
+                    'tx_charge' => 0,
+                    'date' => Carbon::today(),
+                    'wallet_type' => 'main_wallet',
+                    'status' => 1,
+                    'payout_id' => 0,
+                    'tx_record' => $l,
+                    'remark' => "Received $source income of amount $payable_amount from $name ($username) from level $l",
+                ];
+
+                $inserted = Transaction::create($transaction);
+                if (@$inserted) {
+                    // Fetch wallet column names based on conditions
+                    $source_1 = WalletType::where('slug', 'like', $source)
+                        ->where('wallet_type', 'income')
+                        ->where($reg_type, 1)
+                        ->value('wallet_column');
+
+                    $source_2 = WalletType::where('slug', 'like', 'main_wallet')
+                        ->where('wallet_type', 'wallet')
+                        ->where($reg_type, 1)
+                        ->value('wallet_column');
+
+                    // Fetch current wallet amounts
+                    $userWallet = UserWallet::firstOrNew(['u_code' => $code]); // Use firstOrNew to avoid duplicate queries
+                    $source_1_amount = $userWallet->$source_1 ?? 0;
+                    $source_2_amount = $userWallet->$source_2 ?? 0;
+
+                    // Update wallet amounts
+                    $userWallet->$source_1 = $source_1_amount + $payable_amount;
+                    $userWallet->$source_2 = $source_2_amount + $payable_amount;
+
+                    // Save or update record
+                    $userWallet->save();
+                }
+            }
+        }
+    }
+    public function orderhistory()
+    {
+        return view('user.orderhistory');
+    }
+    public function getorderhistory(Request $request)
+    {
+        $user = Auth::user();
+        $query = Order::where('orders.status',  '1')->where('u_code', $user->id)
+            ->join('users', 'orders.u_code', '=', 'users.id') // Join with users table
+            ->join('pin_details', 'orders.package_type', '=', 'pin_details.id') // Join with users table
+            ->select('orders.*', 'pin_details.pin_type', 'users.username', 'users.name');
+
+        if ($request->status) {
+            switch ($request->status) {
+                case 'approve':
+                    $query->where('orders.status', 1);
+                    break;
+                case 'pending':
+                    $query->where('orders.status', 0);
+                    break;
+                case 'cancel':
+                    $query->where('orders.status', 2);
+                    break;
+            }
+        }
+
+        return DataTables::of($query)
+            // ->addColumn('actions', function ($row) {
+            //     return view('user.partials.fundrequest-actions', compact('row'))->render();
+            // })
+            //->rawColumns(['actions']) // Ensure the actions column is not escaped
+            ->make(true);
+    }
+    public function reporthistory()
+    {
+        $user = Auth::user();
+        return view('user.reporthistory', compact('user'));
     }
 }

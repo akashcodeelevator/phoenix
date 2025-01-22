@@ -35,8 +35,8 @@
                 <div class="menu-title">My Genealogy</div>
             </a>
             <ul>
-                <li><a href="#"><i class="material-icons-outlined">arrow_right</i>Directs</a></li>
-                <li><a href="#"><i class="material-icons-outlined">arrow_right</i>Generation</a></li>
+                <li><a href="{{ route('user.teamdirects') }}"><i class="material-icons-outlined">arrow_right</i>Directs</a></li>
+                <li><a href="{{ route('user.generation') }}"><i class="material-icons-outlined">arrow_right</i>Generation</a></li>
             </ul>
         </li>
         <li>
@@ -87,13 +87,13 @@
             </ul>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ route('user.orderhistory') }}">
                 <div class="parent-icon"><i class="material-icons-outlined">filter_none</i></div>
                 <div class="menu-title">Orders</div>
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="{{ route('user.reporthistory') }}">
                 <div class="parent-icon"><i class="material-icons-outlined">event_note</i></div>
                 <div class="menu-title">Report</div>
             </a>
@@ -105,10 +105,15 @@
             </a>
         </li>
         <li>
-            <a href="#">
+            <a href="javascript:;" class="has-arrow">
                 <div class="parent-icon"><i class="material-icons-outlined">settings_applications</i></div>
-                <div class="menu-title">Support</div>
+                <div class="menu-title">My Support</div>
             </a>
+            <ul>
+                <li><a href="{{ route('user.support') }}"><i
+                            class="material-icons-outlined">arrow_right</i>Support</a></li>
+                <li><a href="{{ route('user.supporthistory') }}"><i class="material-icons-outlined">arrow_right</i>Support History</a></li>
+            </ul>
         </li>
         <li>
             <a href="{{ route('user.logout') }}" onclick="event.preventDefault();  document.getElementById('logout-form').submit();">

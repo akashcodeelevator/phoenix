@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\{FundRequestController, OrderController, ReportCo
 use App\Http\Controllers\User\Auth\{ForgotPasswordController, ResetPasswordController, UserLoginController};
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\FundController;
+use App\Http\Controllers\User\GenealogyController;
+use App\Http\Controllers\User\SupportController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -146,5 +148,24 @@ Route::prefix('user')->group(function () {
 
         Route::get('/withdrawhistory', [FundController::class, 'withdrawhistory'])->name('withdrawhistory');
         Route::get('/get-withdraw-history', [FundController::class, 'getwithdrawhistory'])->name('getwithdrawhistory');
+
+        //Order
+        Route::get('/orderhistory', [FundController::class, 'orderhistory'])->name('orderhistory');
+        Route::get('/get-order-history', [FundController::class, 'getorderhistory'])->name('getorderhistory');
+        //Report
+        Route::get('/reporthistory', [FundController::class, 'reporthistory'])->name('reporthistory');
+        Route::get('/get-report-history', [FundController::class, 'getreporthistory'])->name('getreporthistory');
+
+        //Report
+        Route::get('/support', [SupportController::class, 'supportform'])->name(name: 'support');
+        Route::post('/support-submit', [SupportController::class, 'support'])->name('supportsubmit');
+        Route::get('/supporthistory', [SupportController::class, 'supporthistory'])->name('supporthistory');
+        Route::get('/get-support-history', [SupportController::class, 'getsupporthistory'])->name('getsupporthistory');
+        //Direct Team
+        Route::get('/team-directs', [GenealogyController::class, 'teamdirectsform'])->name('teamdirects');
+        Route::get('/get-teamdirects-history', [GenealogyController::class, 'teamdirects'])->name('teamdirectshistory');
+        //Generation Team
+        Route::get('/generation-directs', [GenealogyController::class, 'generationform'])->name('generation');
+        Route::get('/get-generation-history', [GenealogyController::class, 'generation'])->name('generationhistory');
     });
 });
